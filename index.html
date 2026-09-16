@@ -62,17 +62,16 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
 .panel.flat{background:transparent;border:none;padding:0;box-shadow:none}
 .ptitle{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 13px;display:flex;align-items:center;gap:8px}
 .ptitle .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:0}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fields3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-@media (max-width:620px){.fields3{grid-template-columns:1fr}}
-@media (max-width:480px){.fields{grid-template-columns:1fr}}
-.field label{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.fields3{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.field{min-width:0}
+.field label{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-bottom:6px;overflow-wrap:anywhere}
 .stepper{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:999px;overflow:hidden;background:var(--surface-2)}
 .stepper:focus-within{border-color:var(--accent)}
 .stepper button{appearance:none;border:0;background:transparent;color:var(--accent);font-family:inherit;font-size:18px;font-weight:600;width:38px;cursor:pointer;line-height:1;flex:none}
 .stepper button:hover{background:var(--accent);color:#fff}
 .stepper button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:999px}
-.stepper input{flex:1;min-width:0;appearance:none;border:0;background:transparent;color:var(--text);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:17px;font-weight:600;text-align:center;padding:9px 0;font-variant-numeric:tabular-nums}
+.stepper input{flex:1 1 0;width:0;min-width:0;appearance:none;border:0;background:transparent;color:var(--text);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:17px;font-weight:600;text-align:center;padding:9px 0;font-variant-numeric:tabular-nums}
 .stepper input:focus{outline:none}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .stepper input[type=number]{-moz-appearance:textfield}
@@ -89,6 +88,7 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
 .fill.f3{background:var(--gc-gradient)}
 .marks{position:relative;height:16px;margin-top:5px;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
 .mark{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.mark:last-child{transform:translateX(-100%)}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px}
 .tier{position:relative;border:1px solid var(--border);border-radius:10px;padding:10px 6px 8px;text-align:center;background:var(--surface-2);transition:border-color .2s,background .2s,box-shadow .2s;overflow:hidden}
 .tier::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--tc)}
