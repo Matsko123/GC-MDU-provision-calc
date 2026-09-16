@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Löneräknare MDU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F5F4F8;
+  --surface:#FFFFFF;
+  --surface-2:#EDECF3;
+  --border:#DEDCE8;
+  --border-strong:#C7C4D6;
+  --text:#16151E;
+  --muted:#6B6880;
+  --faint:#9996AC;
+  --accent:#6B3FF2;
+  --accent-soft:#EDE7FF;
+  --money:#0F8F6B;
+  --money-soft:#DFF5EE;
+  --warn:#B96A00;
+  --t1:#8E8BA3;
+  --t2:#6B3FF2;
+  --t3:#0F8F6B;
+  --shadow:0 1px 2px rgba(22,21,30,.06),0 8px 24px -12px rgba(22,21,30,.18);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D0E13;
+    --surface:#16171F;
+    --surface-2:#1D1F29;
+    --border:#282B38;
+    --border-strong:#3A3E4F;
+    --text:#E9E8F0;
+    --muted:#9591A8;
+    --faint:#6D6A80;
+    --accent:#9A7BFF;
+    --accent-soft:#241C42;
+    --money:#3BD9A4;
+    --money-soft:#0F2E26;
+    --warn:#FFAE3D;
+    --t1:#6D6A80;
+    --t2:#9A7BFF;
+    --t3:#3BD9A4;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D0E13;
+  --surface:#16171F;
+  --surface-2:#1D1F29;
+  --border:#282B38;
+  --border-strong:#3A3E4F;
+  --text:#E9E8F0;
+  --muted:#9591A8;
+  --faint:#6D6A80;
+  --accent:#9A7BFF;
+  --accent-soft:#241C42;
+  --money:#3BD9A4;
+  --money-soft:#0F2E26;
+  --warn:#FFAE3D;
+  --t1:#6D6A80;
+  --t2:#9A7BFF;
+  --t3:#3BD9A4;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ground);
+  color:var(--text);
+  font-family:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 32px;display:flex;flex-direction:column;gap:14px}
+
+/* ---- header ---- */
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.head h1{margin:0;font-size:21px;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 2px}
+.themebtn{
+  appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--muted);
+  font-family:inherit;font-size:12px;font-weight:500;padding:5px 11px;border-radius:999px;cursor:pointer;
+}
+.themebtn:hover{border-color:var(--border-strong);color:var(--text)}
+.themebtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---- panels ---- */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.panel.flat{background:transparent;border:none;padding:0}
+.ptitle{
+  font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 12px;display:flex;align-items:center;gap:8px
+}
+.ptitle .n{
+  display:inline-grid;place-items:center;width:17px;height:17px;border-radius:5px;
+  background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0
+}
+
+/* ---- inputs ---- */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.fields{grid-template-columns:1fr}}
+.field label{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.stepper{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:9px;overflow:hidden;background:var(--surface-2)}
+.stepper button{
+  appearance:none;border:0;background:transparent;color:var(--muted);font-family:inherit;
+  font-size:17px;font-weight:600;width:38px;cursor:pointer;line-height:1;flex:none
+}
+.stepper button:hover{background:var(--border);color:var(--text)}
+.stepper button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.stepper input{
+  flex:1;min-width:0;appearance:none;border:0;background:transparent;color:var(--text);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:17px;font-weight:600;
+  text-align:center;padding:9px 0;font-variant-numeric:tabular-nums
+}
+.stepper input:focus{outline:2px solid var(--accent);outline-offset:-2px;border-radius:7px}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input[type=number]{-moz-appearance:textfield}
+
+/* ---- ladder ---- */
+.ladder{margin-top:18px}
+.track{position:relative;height:9px;border-radius:999px;overflow:hidden;background:var(--surface-2);display:flex}
+.seg{height:100%}
+.seg.s0{background:var(--t1);opacity:.35}
+.seg.s1{background:var(--t1);opacity:.55}
+.seg.s2{background:var(--t2);opacity:.55}
+.seg.s3{background:var(--t3);opacity:.55}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--accent);transition:width .35s cubic-bezier(.22,1,.36,1)}
+.fill.tier3{background:var(--money)}
+.marks{position:relative;height:16px;margin-top:5px;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
+.mark{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.tier{
+  border:1px solid var(--border);border-radius:8px;padding:7px 6px;text-align:center;
+  background:var(--surface-2);transition:border-color .2s,background .2s
+}
+.tier .r{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.tier .l{font-size:10px;color:var(--faint);margin-top:1px}
+.tier.on{border-color:var(--accent);background:var(--accent-soft)}
+.tier.on .r{color:var(--accent)}
+.tier.on .l{color:var(--accent);opacity:.85}
+.nextup{margin:11px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+.nextup b{color:var(--text);font-weight:600}
+.nextup .top{color:var(--money);font-weight:600}
+
+/* ---- deal result ---- */
+.result{
+  margin-top:14px;border:1px solid var(--border);border-radius:10px;
+  background:var(--money-soft);padding:14px 16px;display:flex;
+  align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.result .lab{font-size:12.5px;font-weight:500;color:var(--muted)}
+.result .big{
+  font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:600;
+  color:var(--money);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1
+}
+.result .sub{font-size:12px;color:var(--muted);width:100%;margin-top:-2px}
+.boost{
+  margin-top:10px;border-left:3px solid var(--warn);background:var(--surface-2);
+  padding:9px 12px;border-radius:0 8px 8px 0;font-size:12.5px;color:var(--text)
+}
+.boost b{color:var(--warn)}
+
+/* ---- payslip ---- */
+.slip{display:flex;flex-direction:column;gap:0}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.row:last-of-type{border-bottom:0}
+.row .k{font-size:13.5px;color:var(--muted)}
+.row .k em{font-style:normal;color:var(--faint);font-size:12px}
+.row .v{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row.sum{border-top:1px solid var(--border-strong);border-bottom:0;margin-top:4px;padding-top:10px}
+.row.sum .k{color:var(--text);font-weight:600;font-size:13.5px}
+.row.sum .v{font-weight:600}
+.total{
+  margin-top:12px;padding:15px 16px;border-radius:10px;background:var(--accent);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.total .k{color:#fff;font-size:13px;font-weight:600;letter-spacing:.02em;opacity:.92}
+.total .v{
+  font-family:"IBM Plex Mono",monospace;font-size:31px;font-weight:600;color:#fff;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1
+}
+.goal{margin-top:9px;font-size:12.5px;color:var(--muted)}
+.goal b{color:var(--text);font-weight:600}
+.goal .miss{color:var(--warn);font-weight:600}
+.goal .hit{color:var(--money);font-weight:600}
+
+/* ---- presets ---- */
+.presets{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.presets span{font-size:12px;color:var(--faint);margin-right:2px}
+.chip{
+  appearance:none;font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--muted);
+  padding:5px 11px;border-radius:999px
+}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---- settings ---- */
+details{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+summary{
+  cursor:pointer;list-style:none;padding:12px 16px;font-size:12.5px;font-weight:600;
+  color:var(--muted);display:flex;align-items:center;gap:7px
+}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";color:var(--faint);transition:transform .2s;display:inline-block}
+details[open] summary::before{transform:rotate(90deg)}
+summary:hover{color:var(--text)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.setbody{padding:0 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--border);padding-top:14px}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.setrow .sl{font-size:13px;color:var(--text);flex:1;min-width:190px}
+.setrow .sl em{display:block;font-style:normal;font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.4}
+.seg2{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;flex:none}
+.seg2 button{
+  appearance:none;border:0;background:var(--surface-2);color:var(--muted);font-family:inherit;
+  font-size:12.5px;font-weight:500;padding:7px 13px;cursor:pointer
+}
+.seg2 button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.seg2 button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.num{
+  width:86px;flex:none;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);
+  color:var(--text);font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;
+  padding:7px 10px;text-align:right;font-variant-numeric:tabular-nums
+}
+.num:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.note{font-size:11.5px;color:var(--faint);line-height:1.55}
+.note b{color:var(--muted);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <p class="eyebrow">GlobalConnect MDU</p>
+      <h1>Löneräknare</h1>
+    </div>
+    <button class="themebtn" id="themeBtn" type="button">Ljust / mörkt</button>
+  </div>
+
+  <!-- 1. Månaden hittills -->
+  <section class="panel">
+    <p class="ptitle"><span class="n">1</span>Hittills i månaden</p>
+    <div class="fields">
+      <div class="field">
+        <label for="mLgh">Sålda lägenheter</label>
+        <div class="stepper">
+          <button type="button" data-step="mLgh" data-d="-5">−</button>
+          <input type="number" id="mLgh" value="45" min="0" step="1" inputmode="numeric">
+          <button type="button" data-step="mLgh" data-d="5">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="mFk">Fastighetskroppar</label>
+        <div class="stepper">
+          <button type="button" data-step="mFk" data-d="-1">−</button>
+          <input type="number" id="mFk" value="2" min="0" step="1" inputmode="numeric">
+          <button type="button" data-step="mFk" data-d="1">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ladder">
+      <div class="track" id="track">
+        <div class="seg s1" style="flex:60"></div>
+        <div class="seg s2" style="flex:20"></div>
+        <div class="seg s3" style="flex:40"></div>
+        <div class="fill" id="fill" style="width:0%"></div>
+      </div>
+      <div class="marks">
+        <span class="mark" style="left:50%">60</span>
+        <span class="mark" style="left:66.67%">80</span>
+        <span class="mark" style="left:100%">120+</span>
+      </div>
+      <div class="tiers">
+        <div class="tier" id="tier0"><div class="r">400</div><div class="l">0–59 lgh</div></div>
+        <div class="tier" id="tier1"><div class="r">500</div><div class="l">60–79 lgh</div></div>
+        <div class="tier" id="tier2"><div class="r">600</div><div class="l">80+ lgh</div></div>
+      </div>
+      <p class="nextup" id="nextup"></p>
+    </div>
+  </section>
+
+  <!-- 2. Ny affär -->
+  <section class="panel">
+    <p class="ptitle"><span class="n">2</span>Vad ger nästa affär?</p>
+    <div class="fields">
+      <div class="field">
+        <label for="dLgh">Lägenheter i affären</label>
+        <div class="stepper">
+          <button type="button" data-step="dLgh" data-d="-5">−</button>
+          <input type="number" id="dLgh" value="20" min="0" step="1" inputmode="numeric">
+          <button type="button" data-step="dLgh" data-d="5">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dFk">Fastighetskroppar i affären</label>
+        <div class="stepper">
+          <button type="button" data-step="dFk" data-d="-1">−</button>
+          <input type="number" id="dFk" value="1" min="0" step="1" inputmode="numeric">
+          <button type="button" data-step="dFk" data-d="1">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div>
+        <div class="lab">Affären ger dig</div>
+        <div class="big" id="dealBig">0 kr</div>
+      </div>
+      <div class="sub" id="dealSub"></div>
+    </div>
+    <div class="boost" id="boost" hidden></div>
+  </section>
+
+  <!-- 3. Lön -->
+  <section class="panel">
+    <p class="ptitle"><span class="n">3</span>Månadslön efter affären</p>
+    <div class="slip">
+      <div class="row"><div class="k">Grundlön</div><div class="v" id="vBas">20 000 kr</div></div>
+      <div class="row"><div class="k">Framkörning <em id="kFk"></em></div><div class="v" id="vFk">0 kr</div></div>
+      <div class="row"><div class="k">Lägenhetsprovision <em id="kLgh"></em></div><div class="v" id="vLgh">0 kr</div></div>
+      <div class="row sum"><div class="k">Summa före semester</div><div class="v" id="vBrutto">0 kr</div></div>
+      <div class="row"><div class="k">Semesterersättning <em id="kSem">12 %</em></div><div class="v" id="vSem">0 kr</div></div>
+    </div>
+    <div class="total">
+      <div class="k">TOTAL MÅNADSLÖN</div>
+      <div class="v" id="vTotal">0 kr</div>
+    </div>
+    <p class="goal" id="goal"></p>
+  </section>
+
+  <!-- presets -->
+  <div class="panel flat">
+    <div class="presets">
+      <span>Scenarier:</span>
+      <button class="chip" type="button" data-p="40,1">40 lgh</button>
+      <button class="chip" type="button" data-p="60,2">60 lgh</button>
+      <button class="chip" type="button" data-p="80,3">80 lgh</button>
+      <button class="chip" type="button" data-p="100,4">100 lgh</button>
+      <button class="chip" type="button" data-p="0,0">Nollställ</button>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <details id="settings">
+    <summary>Inställningar för provisionsmodellen</summary>
+    <div class="setbody">
+
+      <div class="setrow">
+        <div class="sl">Framkörning — första fastighetskroppen<em>Per månad</em></div>
+        <input class="num" type="number" id="setFk1" value="1000" min="0" step="100" inputmode="numeric">
+      </div>
+
+      <div class="setrow">
+        <div class="sl">Framkörning — fastighetskropp 2 och framåt</div>
+        <input class="num" type="number" id="setFk2" value="500" min="0" step="100" inputmode="numeric">
+      </div>
+
+      <div class="setrow">
+        <div class="sl">Grundlön</div>
+        <input class="num" type="number" id="setBas" value="20000" min="0" step="500" inputmode="numeric">
+      </div>
+
+      <div class="setrow">
+        <div class="sl">Semesterersättning<em>Påslag på grundlön + provision</em></div>
+        <input class="num" type="number" id="setSem" value="12" min="0" step="0.5" inputmode="decimal">
+      </div>
+
+      <div class="setrow">
+        <div class="sl">Lönemål<em>Visas som referens under totalsumman</em></div>
+        <input class="num" type="number" id="setGoal" value="50000" min="0" step="1000" inputmode="numeric">
+      </div>
+
+      <p class="note">
+        <b>Så räknar modellen.</b> Trappan är retroaktiv: när månadens totala antal lägenheter
+        passerar en gräns räknas <em>hela</em> månadens volym om till den nya satsen — även
+        lägenheter som redan är sålda. Gränserna är 0–59, 60–79 och 80+.
+        Framkörning räknas per månad: månadens första fastighetskropp ger den högre
+        ersättningen, resterande den lägre.
+      </p>
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var S = { bas:20000, fk1:1000, fk2:500, sem:12, goal:50000 };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var kr = function(n){
+    return Math.round(n).toLocaleString("sv-SE").replace(/ /g," ") + " kr";
+  };
+
+  /* ---------- modell ---------- */
+  function rateFor(total){
+    if (total >= 80) return 600;
+    if (total >= 60) return 500;
+    return 400;
+  }
+  /* Retroaktiv trappa: hela månadens volym betalas med den sats
+     som månadens totala antal lägenheter landar på. */
+  function lghProv(total){
+    if (total <= 0) return 0;
+    return total * rateFor(total);
+  }
+  function fkProv(n){
+    if (n <= 0) return 0;
+    return S.fk1 + (n-1)*S.fk2;
+  }
+  function provision(lgh, fk){ return lghProv(lgh) + fkProv(fk); }
+
+  function val(id){
+    var v = parseInt($(id).value, 10);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    var mLgh = val("mLgh"), mFk = val("mFk");
+    var dLgh = val("dLgh"), dFk = val("dFk");
+    var tLgh = mLgh + dLgh, tFk = mFk + dFk;
+
+    /* -- trappa (position före affären) -- */
+    var rateNow = rateFor(mLgh);
+    var pos = Math.min(mLgh, 120) / 120 * 100;
+    var fill = $("fill");
+    fill.style.width = pos + "%";
+    fill.className = "fill" + (mLgh >= 80 ? " tier3" : "");
+
+    var active = mLgh >= 80 ? 2 : mLgh >= 60 ? 1 : 0;
+    for (var i=0;i<3;i++){
+      $("tier"+i).classList.toggle("on", i === active);
+    }
+
+    var nxt = $("nextup");
+    if (mLgh >= 80){
+      nxt.innerHTML = 'Du ligger på <b>' + rateNow + ' kr/lgh</b> — <span class="top">högsta nivån</span>.';
+    } else {
+      var target = mLgh >= 60 ? 80 : 60;
+      var need = target - mLgh;
+      var newRate = rateFor(target);
+      nxt.innerHTML = 'Du ligger på <b>' + rateNow + ' kr/lgh</b>. ' +
+        '<b>' + need + ' lgh</b> till så höjs du till <b>' + newRate + ' kr/lgh</b>.';
+    }
+
+    /* -- affärens värde -- */
+    var before = provision(mLgh, mFk);
+    var after  = provision(tLgh, tFk);
+    var deal   = after - before;
+    var dealSem = deal * (S.sem/100);
+
+    $("dealBig").textContent = kr(deal + dealSem);
+    $("dealSub").textContent = (dLgh + dFk === 0)
+      ? "Fyll i affären ovan."
+      : "Provision " + kr(deal) + " + semester " + kr(dealSem) + ".";
+
+    var boost = $("boost");
+    var rateAfter = rateFor(tLgh);
+    if (rateAfter > rateNow && dLgh > 0){
+      var flat = dLgh * rateNow + (fkProv(tFk) - fkProv(mFk));
+      boost.hidden = false;
+      boost.innerHTML = '<b>Trappan slår till.</b> Affären lyfter dig till ' + rateAfter +
+        ' kr/lgh och hela månadens volym räknas om — ' + kr(deal - flat) +
+        ' extra jämfört med om du stannat på ' + rateNow + ' kr/lgh.';
+    } else {
+      boost.hidden = true;
+    }
+
+    /* -- lönespecifikation -- */
+    var vFk = fkProv(tFk), vLgh = lghProv(tLgh);
+    var brutto = S.bas + vFk + vLgh;
+    var sem = brutto * (S.sem/100);
+    var total = brutto + sem;
+
+    $("vBas").textContent = kr(S.bas);
+    $("vFk").textContent  = kr(vFk);
+    $("vLgh").textContent = kr(vLgh);
+    $("kFk").textContent  = tFk > 0 ? "· " + tFk + " st" : "";
+    $("kLgh").textContent = tLgh > 0 ? "· " + tLgh + " lgh × " + rateAfter + " kr" : "";
+    $("kSem").textContent = S.sem + " %";
+    $("vBrutto").textContent = kr(brutto);
+    $("vSem").textContent = kr(sem);
+    $("vTotal").textContent = kr(total);
+
+    var g = $("goal");
+    if (S.goal > 0){
+      if (total >= S.goal){
+        g.innerHTML = '<span class="hit">Över lönemålet</span> med <b>' + kr(total - S.goal) + '</b>.';
+      } else {
+        g.innerHTML = '<span class="miss">' + kr(S.goal - total) + ' under lönemålet</span> på ' + kr(S.goal) + '.';
+      }
+    } else { g.textContent = ""; }
+
+    save();
+  }
+
+  /* ---------- inställningar ---------- */
+  function readSettings(){
+    var num = function(id, def){
+      var v = parseFloat($(id).value);
+      return (isNaN(v) || v < 0) ? def : v;
+    };
+    S.fk1   = num("setFk1", 1000);
+    S.fk2   = num("setFk2", 500);
+    S.bas   = num("setBas", 20000);
+    S.sem   = num("setSem", 12);
+    S.goal  = num("setGoal", 50000);
+    render();
+  }
+
+  /* ---------- persistens (best effort) ---------- */
+  var KEYS = ["mLgh","mFk","dLgh","dFk","setFk1","setFk2","setBas","setSem","setGoal"];
+  function save(){
+    try {
+      var o = {theme:document.documentElement.getAttribute("data-theme")||""};
+      KEYS.forEach(function(k){ o[k] = $(k).value; });
+      localStorage.setItem("mdu-kalkyl", JSON.stringify(o));
+    } catch(e){}
+  }
+  function load(){
+    try {
+      var o = JSON.parse(localStorage.getItem("mdu-kalkyl") || "null");
+      if (!o) return;
+      KEYS.forEach(function(k){ if (o[k] !== undefined && o[k] !== "") $(k).value = o[k]; });
+      if (o.theme) document.documentElement.setAttribute("data-theme", o.theme);
+    } catch(e){}
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if (!b) return;
+
+    if (b.dataset.step){
+      var f = $(b.dataset.step);
+      var v = (parseInt(f.value,10) || 0) + parseInt(b.dataset.d,10);
+      f.value = Math.max(0, v);
+      render();
+      return;
+    }
+    if (b.dataset.p){
+      var p = b.dataset.p.split(",");
+      $("mLgh").value = p[0]; $("mFk").value = p[1];
+      $("dLgh").value = 0;    $("dFk").value = 0;
+      render();
+      return;
+    }
+    if (b.id === "themeBtn"){
+      var r = document.documentElement;
+      var cur = r.getAttribute("data-theme");
+      if (!cur){
+        cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      r.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+      save();
+      return;
+    }
+  });
+
+  ["mLgh","mFk","dLgh","dFk"].forEach(function(id){
+    $(id).addEventListener("input", render);
+  });
+  ["setFk1","setFk2","setBas","setSem","setGoal"].forEach(function(id){
+    $(id).addEventListener("input", readSettings);
+  });
+
+  load();
+  readSettings();
+})();
+</script>
+</body>
+</html>
