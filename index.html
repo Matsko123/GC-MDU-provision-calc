@@ -63,17 +63,21 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
 .ptitle{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 13px;display:flex;align-items:center;gap:8px}
 .ptitle .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:0}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:620px){.fields3{grid-template-columns:1fr}}
 @media (max-width:480px){.fields{grid-template-columns:1fr}}
 .field label{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-bottom:6px}
 .stepper{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:999px;overflow:hidden;background:var(--surface-2)}
 .stepper:focus-within{border-color:var(--accent)}
-.stepper button{appearance:none;border:0;background:transparent;color:var(--accent);font-family:inherit;font-size:18px;font-weight:600;width:40px;cursor:pointer;line-height:1;flex:none}
+.stepper button{appearance:none;border:0;background:transparent;color:var(--accent);font-family:inherit;font-size:18px;font-weight:600;width:38px;cursor:pointer;line-height:1;flex:none}
 .stepper button:hover{background:var(--accent);color:#fff}
 .stepper button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:999px}
 .stepper input{flex:1;min-width:0;appearance:none;border:0;background:transparent;color:var(--text);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:17px;font-weight:600;text-align:center;padding:9px 0;font-variant-numeric:tabular-nums}
 .stepper input:focus{outline:none}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .stepper input[type=number]{-moz-appearance:textfield}
+.hint{margin:9px 0 0;font-size:11.5px;color:var(--faint);line-height:1.5}
+.hint.warn{color:var(--rose-ink);font-weight:500}
 .ladder{margin-top:18px}
 .track{position:relative;height:10px;border-radius:999px;overflow:hidden;background:var(--surface-2);display:flex}
 .seg{height:100%;opacity:.22}
@@ -142,7 +146,7 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
 
   <section class="panel">
     <p class="ptitle"><span class="n">1</span>Hittills i månaden</p>
-    <div class="fields">
+    <div class="fields3">
       <div class="field">
         <label for="mLgh">Sålda lägenheter</label>
         <div class="stepper">
@@ -152,14 +156,24 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
         </div>
       </div>
       <div class="field">
-        <label for="mFk">Fastighetskroppar</label>
+        <label for="mAff">Avslutade affärer</label>
+        <div class="stepper">
+          <button type="button" data-step="mAff" data-d="-1">−</button>
+          <input type="number" id="mAff" value="2" min="0" step="1" inputmode="numeric">
+          <button type="button" data-step="mAff" data-d="1">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="mFk">Fastighetskroppar totalt</label>
         <div class="stepper">
           <button type="button" data-step="mFk" data-d="-1">−</button>
-          <input type="number" id="mFk" value="2" min="0" step="1" inputmode="numeric">
+          <input type="number" id="mFk" value="3" min="0" step="1" inputmode="numeric">
           <button type="button" data-step="mFk" data-d="1">+</button>
         </div>
       </div>
     </div>
+    <p class="hint" id="hintFk"></p>
+
     <div class="ladder">
       <div class="track" id="track">
         <div class="seg s1" style="flex:60"></div>
@@ -201,6 +215,8 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
         </div>
       </div>
     </div>
+    <p class="hint" id="hintDeal"></p>
+
     <div class="result">
       <div>
         <div class="lab">Affären ger dig</div>
@@ -229,22 +245,25 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
   <div class="panel flat">
     <div class="presets">
       <span>Scenarier:</span>
-      <button class="chip" type="button" data-p="40,1">40 lgh</button>
-      <button class="chip" type="button" data-p="60,2">60 lgh</button>
-      <button class="chip" type="button" data-p="80,3">80 lgh</button>
-      <button class="chip" type="button" data-p="100,4">100 lgh</button>
-      <button class="chip" type="button" data-p="0,0">Nollställ</button>
+      <button class="chip" type="button" data-p="40,2,3">40 lgh</button>
+      <button class="chip" type="button" data-p="60,3,4">60 lgh</button>
+      <button class="chip" type="button" data-p="80,4,6">80 lgh</button>
+      <button class="chip" type="button" data-p="100,5,8">100 lgh</button>
+      <button class="chip" type="button" data-p="0,0,0">Nollställ</button>
     </div>
   </div>
 
   <p class="note">
-    <b>Så räknar modellen.</b> Grundlön 20 000 kr. Fastighetskropp: månadens första ger
-    1 000 kr, därefter 500 kr per styck. Lägenhetsprovisionen bestäms av månadens totala
-    antal lägenheter och trappan är <em>retroaktiv</em> — när volymen passerar en gräns
-    räknas hela månadens volym om till den nya satsen, även lägenheter som redan är sålda.
-    Semesterersättning 12 % läggs på grundlön plus provision. Räknaren är ett hjälpmedel
-    för att uppskatta lönen; utbetald ersättning utgår alltid från godkända avtal
-    rapporterade via säljrapport-arket.
+    <b>Så räknar modellen.</b> Grundlön 20 000 kr.
+    <em>Fastighetskropp räknas per affär:</em> den första fastighetskroppen i varje affär ger
+    1 000 kr, övriga fastighetskroppar i samma affär ger 500 kr styck. Nästa affär börjar om
+    på 1 000 kr igen.
+    Lägenhetsprovisionen bestäms av månadens totala antal lägenheter och trappan är
+    <em>retroaktiv</em> — när volymen passerar en gräns räknas hela månadens volym om till
+    den nya satsen, även lägenheter som redan är sålda.
+    Semesterersättning 12 % läggs på grundlön plus provision.
+    Räknaren är ett hjälpmedel för att uppskatta lönen; utbetald ersättning utgår alltid från
+    godkända avtal rapporterade via säljrapport-arket.
   </p>
 </div>
 
@@ -252,20 +271,44 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
 (function(){
   "use strict";
   var GRUNDLON = 20000, FK_FORSTA = 1000, FK_OVRIGA = 500, SEMESTER = 12;
+
   var $ = function(id){ return document.getElementById(id); };
   var kr = function(n){ return Math.round(n).toLocaleString("sv-SE").replace(/ /g," ") + " kr"; };
 
   function rateFor(t){ return t >= 80 ? 600 : t >= 60 ? 500 : 400; }
   function tierIndex(t){ return t >= 80 ? 2 : t >= 60 ? 1 : 0; }
   function lghProv(t){ return t <= 0 ? 0 : t * rateFor(t); }
-  function fkProv(n){ return n <= 0 ? 0 : FK_FORSTA + (n-1)*FK_OVRIGA; }
-  function provision(lgh, fk){ return lghProv(lgh) + fkProv(fk); }
+
+  /* Fastighetskropp betalas PER AFFAR: forsta kroppen i varje affar ger
+     FK_FORSTA, ovriga kroppar i samma affar ger FK_OVRIGA. */
+  function fkProv(affarer, kroppar){
+    if (affarer <= 0 || kroppar <= 0) return 0;
+    var a = Math.min(affarer, kroppar);
+    return a * FK_FORSTA + (kroppar - a) * FK_OVRIGA;
+  }
+
   function val(id){ var v = parseInt($(id).value,10); return (isNaN(v)||v<0) ? 0 : v; }
 
   function render(){
-    var mLgh = val("mLgh"), mFk = val("mFk");
+    var mLgh = val("mLgh"), mAff = val("mAff"), mFk = val("mFk");
     var dLgh = val("dLgh"), dFk = val("dFk");
-    var tLgh = mLgh + dLgh, tFk = mFk + dFk;
+    var dAff = (dFk > 0 || dLgh > 0) ? 1 : 0;
+    var tLgh = mLgh + dLgh, tAff = mAff + dAff, tFk = mFk + dFk;
+
+    var hf = $("hintFk");
+    if (mAff > 0 && mFk < mAff){
+      hf.className = "hint warn";
+      hf.textContent = "Du har fler affärer än fastighetskroppar. Varje affär innehåller minst en fastighetskropp — kontrollera siffrorna.";
+    } else if (mAff > 0){
+      var ovr = mFk - mAff;
+      hf.className = "hint";
+      hf.textContent = mAff + (mAff === 1 ? " affär" : " affärer") + " ger " + kr(mAff * FK_FORSTA) +
+        " i första-kroppar" +
+        (ovr > 0 ? " plus " + kr(ovr * FK_OVRIGA) + " för " + ovr + (ovr === 1 ? " kropp" : " kroppar") + " till" : "") + ".";
+    } else {
+      hf.className = "hint";
+      hf.textContent = "";
+    }
 
     var rateNow = rateFor(mLgh), idxNow = tierIndex(mLgh);
     var fill = $("fill");
@@ -282,28 +325,42 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
         need + ' lgh</b> till så höjs du till <span class="rate">' + rateFor(target) + ' kr/lgh</span>';
     }
 
-    var deal = provision(tLgh, tFk) - provision(mLgh, mFk);
+    var fkBefore = fkProv(mAff, mFk), fkAfter = fkProv(tAff, tFk);
+    var deal = (lghProv(tLgh) + fkAfter) - (lghProv(mLgh) + fkBefore);
     var dealSem = deal * (SEMESTER/100);
+
     $("dealBig").textContent = kr(deal + dealSem);
-    $("dealSub").textContent = (dLgh + dFk === 0) ? "Fyll i affären ovan."
+    $("dealSub").textContent = (dAff === 0) ? "Fyll i affären ovan."
       : "Provision " + kr(deal) + " + semester " + kr(dealSem) + ".";
+
+    var hd = $("hintDeal");
+    if (dFk > 0){
+      hd.className = "hint";
+      hd.textContent = "Fastighetskropp i affären: " + kr(FK_FORSTA) + " för den första" +
+        (dFk > 1 ? " + " + kr((dFk-1) * FK_OVRIGA) + " för " + (dFk-1) + (dFk-1 === 1 ? " kropp" : " kroppar") + " till" : "") +
+        " = " + kr(fkAfter - fkBefore) + ".";
+    } else {
+      hd.className = "hint";
+      hd.textContent = "";
+    }
 
     var boost = $("boost"), rateAfter = rateFor(tLgh);
     if (rateAfter > rateNow && dLgh > 0){
-      var flat = dLgh * rateNow + (fkProv(tFk) - fkProv(mFk));
+      var flat = dLgh * rateNow + (fkAfter - fkBefore);
       boost.hidden = false;
       boost.innerHTML = '<b>Trappan slår till.</b> Affären lyfter dig till ' + rateAfter +
         ' kr/lgh och hela månadens volym räknas om — ' + kr(deal - flat) +
         ' extra jämfört med om du stannat på ' + rateNow + ' kr/lgh.';
     } else { boost.hidden = true; }
 
-    var vFk = fkProv(tFk), vLgh = lghProv(tLgh);
+    var vFk = fkAfter, vLgh = lghProv(tLgh);
     var brutto = GRUNDLON + vFk + vLgh;
     var sem = brutto * (SEMESTER/100);
+
     $("vBas").textContent = kr(GRUNDLON);
     $("vFk").textContent = kr(vFk);
     $("vLgh").textContent = kr(vLgh);
-    $("kFk").textContent = tFk > 0 ? "· " + tFk + " st" : "";
+    $("kFk").textContent = tFk > 0 ? "· " + tFk + " st i " + tAff + (tAff === 1 ? " affär" : " affärer") : "";
     $("kLgh").textContent = tLgh > 0 ? "· " + tLgh + " lgh × " + rateAfter + " kr" : "";
     $("vBrutto").textContent = kr(brutto);
     $("vSem").textContent = kr(sem);
@@ -311,17 +368,17 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
     save();
   }
 
-  var KEYS = ["mLgh","mFk","dLgh","dFk"];
+  var KEYS = ["mLgh","mAff","mFk","dLgh","dFk"];
   function save(){
     try {
       var o = {theme:document.documentElement.getAttribute("data-theme")||""};
       KEYS.forEach(function(k){ o[k] = $(k).value; });
-      localStorage.setItem("mdu-kalkyl", JSON.stringify(o));
+      localStorage.setItem("mdu-kalkyl2", JSON.stringify(o));
     } catch(e){}
   }
   function load(){
     try {
-      var o = JSON.parse(localStorage.getItem("mdu-kalkyl") || "null");
+      var o = JSON.parse(localStorage.getItem("mdu-kalkyl2") || "null");
       if (!o) return;
       KEYS.forEach(function(k){ if (o[k] !== undefined && o[k] !== "") $(k).value = o[k]; });
       if (o.theme) document.documentElement.setAttribute("data-theme", o.theme);
@@ -338,7 +395,7 @@ body{background:var(--ground);color:var(--text);font-family:Archivo,-apple-syste
     }
     if (b.dataset.p){
       var p = b.dataset.p.split(",");
-      $("mLgh").value = p[0]; $("mFk").value = p[1];
+      $("mLgh").value = p[0]; $("mAff").value = p[1]; $("mFk").value = p[2];
       $("dLgh").value = 0; $("dFk").value = 0;
       render(); return;
     }
